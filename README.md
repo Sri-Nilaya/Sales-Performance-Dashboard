@@ -102,4 +102,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 ## Contact
 Your Name - srinilaya.pemmaraju@gmail.com
 
-Project Link: [https://github.com/yourusername/sales-performance-dashboard](https://github.com/yourusername/sales-performance-dashboard)
+Project Link: [https://github.com/Sri-Nilaya/sales-performance-dashboard](https://github.com/Sri-Nilaya/sales-performance-dashboard)
