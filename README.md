@@ -100,6 +100,6 @@ This project was created as a learning exercise to understand:
 Distributed under the MIT License. See `LICENSE` for more information.
 
 ## Contact
-Your Name - your.email@example.com
+Your Name - srinilaya.pemmaraju@gmail.com
 
 Project Link: [https://github.com/yourusername/sales-performance-dashboard](https://github.com/yourusername/sales-performance-dashboard)
