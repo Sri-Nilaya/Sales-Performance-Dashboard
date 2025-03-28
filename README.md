@@ -30,7 +30,7 @@ The Sales Performance Dashboard is a Python-based data analysis tool designed to
 1. Clone the repository
 ```bash
 git clone https://github.com/Sri-Nilaya/Sales-Performance-Dashboard.git
-cd sales-performance-dashboard
+cd Sales-Performance-Dashboard
 ```
 
 2. Create virtual environment
