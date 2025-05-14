@@ -42,3 +42,6 @@ build/
 # Sensitive or local configuration
 config.ini
 *.secret
+
+# Logs
+*.log

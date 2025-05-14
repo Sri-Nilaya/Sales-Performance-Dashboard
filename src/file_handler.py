@@ -1,26 +1,7 @@
 import logging
 import pandas as pd
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-# File handler
-file_handler = logging.FileHandler('sales_analyzer.log')
-file_handler.setLevel(logging.INFO)
-
-# Console handler
-console_handler = logging.StreamHandler()
-console_handler.setLevel(logging.INFO)
-
-# Formatter
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-file_handler.setFormatter(formatter)
-console_handler.setFormatter(formatter)
-
-# Add handlers
-logger.addHandler(file_handler)
-logger.addHandler(console_handler)
-
+import logging
+from src.utils.logger import LoggerManager
 
 class FileHandle:
     def __init__(self, file_path):
@@ -39,6 +20,11 @@ class FileHandle:
         # Initialize missing_columns to 0
         self.missing_columns = 0
 
+        logger_manager = LoggerManager(logger_name = __name__, log_level = logging.INFO, log_file_name = "file_handler" )
+        self.logger = logger_manager.get_logger()
+
+
+
     
     def read_file(self):
         try:
@@ -53,23 +39,23 @@ class FileHandle:
 
         except FileNotFoundError:
             # Handle case where file doesn't exist
-            print("Error: File not found.")
+            self.logger.error("Error: File not found.")
         except PermissionError:
             # Handle case where file can't be accessed due to permissions
-            print("Error: Permission denied.")
+            self.logger.error("Error: Permission denied.")
         except Exception as e:
             # Catch any other unexpected errors
-            print(f"An unexpected error occurred: {e}")
+            self.logger.error(f"An unexpected error occurred: {e}")
     
     def validate_data(self):
         # Check if DataFrame object is None
-        if self.sales_file_df == None:
-            print("Error: No data found. Read the file first.")
+        if self.sales_file_df is None:
+            self.logger.warning("Error: No data found. Read the file first.")
             return
         
         # Check if entire DataFrame is empty with no rows, columns
         if self.sales_file_df.empty:
-            print("DataFrame is empty")
+            self.logger.warning("DataFrame is empty")
             return
         
         # Check if any rows, columns are missing
@@ -79,22 +65,22 @@ class FileHandle:
             self.missing_columns = [col for col in self.expected_columns if col not in self.sales_file_df.columns]
         
             if len(self.missing_columns) > 0:
-                logger.warning(f"These columns are missing: {self.missing_columns}")
+                self.logger.warning(f"These columns are missing: {self.missing_columns}")
 
             # 2. Check if any unexpected columns are present and print them
             if len(self.sales_file_df.columns) > len(self.expected_columns):
                 unexpected_columns = [col for col in self.sales_file_df.columns if col not in self.expected_columns]
-                logger.warning(f"These columns are unexpected:\n {unexpected_columns}")
+                self.logger.warning(f"These columns are unexpected:\n {unexpected_columns}")
 
             # 3. Check if the DataFrame rows are Null or not
             if self.sales_file_df.shape[0] == 0:
-                logger.warning("DataFrame has no rows")
+                self.logger.warning("DataFrame has no rows")
                 return
             
             # 4. Check if duplicate rows exist
             duplicate_rows = self.sales_file_df.duplicated().sum()
             if duplicate_rows > 0:
-                logger.warning(f"There are {duplicate_rows} Duplicate rows")
+                self.logger.warning(f"There are {duplicate_rows} Duplicate rows")
 
             
 
@@ -102,25 +88,30 @@ class FileHandle:
 
         # 1. Drop all rows that have at least one null value
         self.sales_file_df = self.sales_file_df.dropna()
+        self.logger.info("Dropped all rows that have atleast one null value")
 
         # 2. Remove duplicate rows
         self.sales_file_df.drop_duplicates(inplace=True)
+        self.logger.info("Removed duplicates")
 
         # 3. Filter out rows with negative Total Sales (if column exists)
         if "Total Sales (USD)" not in self.missing_columns: 
             self.sales_file_df = self.sales_file_df[self.sales_file_df['Total Sales (USD)'] > 0]
+            self.logger.info("Removed rows that had negative Total Sales")
         
         # 4. Filter out rows with zero or negative Number of Transactions (if column exists)
         if "Number of Transactions" not in self.missing_columns:
             self.sales_file_df = self.sales_file_df[self.sales_file_df['Number of Transactions'] > 0]
+            self.logger.info("Removed rows with zero or negative Number of Transactions")
 
         # 5. Convert Date column to proper data time format
         if "Date" not in self.missing_columns:
             self.sales_file_df["Date"] = pd.to_datetime(self.sales_file_df['Date'], dayfirst = True)
+            self.logger.info("Converted Date Column to appropriate date time format")
 
         if self.initial_row_count != len(self.sales_file_df):
             current_rowcount = len(self.sales_file_df)
-            logger.info(f"Row count post Data cleaning is: {current_rowcount} ")
+            self.logger.info(f"Row count post Data cleaning is: {current_rowcount} ")
 
         return(self.sales_file_df)
         
